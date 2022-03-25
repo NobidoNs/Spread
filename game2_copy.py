@@ -1,4 +1,3 @@
-from colorsys import TWO_THIRD
 from time import time
 import pygame
 import sys
@@ -69,6 +68,23 @@ def main(winstyle=0):
                         self.sq[row][col].changeColor(color_BLACK)
                     if self.sq[row][col].z==8:
                         self.sq[row][col].changeColor(color_BLACK)
+        
+        def colorJamp(self, x_medium_sq, y_medium_sq):
+            br = False
+            for y in range(3):
+                for x in range(3):
+                    if self.sq[(x_medium_sq*3) + x][(y_medium_sq*3) + y].color == color_WHITE:
+                        self.sq[(x_medium_sq*3) + x][(y_medium_sq*3) + y].changeColor(color_RED)
+                        br = True
+                        break
+                if br == True:
+                    break
+        def getSq(self, x, y):
+            if type(x) != int:
+                print("ERR")
+                return None
+            return self.sq[x][y]
+
         def check(self, x_medium_sq, y_medium_sq, medium_sq):
             x_centr = x_medium_sq * 3 + 1
             y_centr = y_medium_sq * 3 + 1
@@ -82,9 +98,9 @@ def main(winstyle=0):
             # print("y_form", y_medium_sq * 3 + 1)
             
             for i in x_on:
-                if self.sq[(x_centr - 1)  + i][(y_pos - 1)].color != color_WHITE:
+                if self.getSq((x_centr - 1)  + i,(y_pos - 1)).color != color_WHITE:
                     rec += 1
-                    if self.sq[(x_centr - 1)  + i][(y_pos - 1)].color != color_RED:
+                    if self.getSq((x_centr - 1)  + i,(y_pos - 1)).color != color_RED:
                         part = True
                     if rec == 1 or rec == 3:
                         y_pos += 1
@@ -107,29 +123,19 @@ def main(winstyle=0):
                         if rec == 1 or rec == 3:
                             y_pos += 1
                     loops += 1
-                    # print(loops)
-
-                    two_x_medium_sq = x_centr - x_to_activated[loops] // 3
-                    two_y_medium_sq = y_centr - y_to_activated[loops] // 3
+                    x1 = x_centr - x_to_activated[loops]
+                    y1 = y_centr - y_to_activated[loops]
                     
-
-
-                    if self.sq[x_centr - x_to_activated[loops]][y_centr - y_to_activated[loops]].color != color_RED:
-                        if x_centr - x_to_activated[loops] != 18 and y_centr - y_to_activated[loops] != 18:
-                            # print("x_need", x_centr - x_to_activated[loops], "y_need", y_centr - y_to_activated[loops])
-                            self.sq[x_centr - x_to_activated[loops]][y_centr - y_to_activated[loops]].changeColor(color_RED)
+                    two_x_medium_sq = (x1) // 3
+                    two_y_medium_sq = (y1) // 3
+                    
+                    print("a",x1, y1)
+                    print("b",x1, y1)
+                    if self.sq[x1][y1].color == color_WHITE:
+                        if x1 != 18 and y_centr - y1 != 18:
+                            self.sq[x1][y1].changeColor(color_RED)
                     else:
-                        two_x_sq = two_x_medium_sq * 3
-                        two_y_sq = two_y_medium_sq * 3
-                        for ch in x_on:
-                            rec_2 += 1
-                            print(self.sq[(two_x_sq - 1) + ch][two_y_sq - 1])
-                            if self.sq[two_x_sq-ch][two_y_sq].color == color_WHITE:
-                                self.sq[two_x_sq-ch][two_y_sq].changeColor(color_RED)
-                            if rec == 1 or rec == 3:
-                                two_y_sq -= 1
-
-
+                        self.colorJamp(two_x_medium_sq, two_y_medium_sq)
 
             if loops >= 0:
                 for row in range(self.x):
