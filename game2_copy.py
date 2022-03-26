@@ -125,17 +125,18 @@ def main(winstyle=0):
                     loops += 1
                     x1 = x_centr - x_to_activated[loops]
                     y1 = y_centr - y_to_activated[loops]
-                    
+                    # print("a",x1, y1)
+
                     two_x_medium_sq = (x1) // 3
                     two_y_medium_sq = (y1) // 3
+
+                    bul = True
                     
-                    print("a",x1, y1)
-                    print("b",x1, y1)
-                    if self.sq[x1][y1].color == color_WHITE:
-                        if x1 != 18 and y_centr - y1 != 18:
-                            self.sq[x1][y1].changeColor(color_RED)
-                    else:
-                        self.colorJamp(two_x_medium_sq, two_y_medium_sq)
+                    if self.WhatIsColor(x1, y1) != bul:
+                        if self.WhatIsColor(x1, y1) == color_WHITE:
+                            self.ChColor(x1, y1, color_RED)
+                        elif self.WhatIsColor(x1, y1) == color_RED:
+                            self.colorJamp(two_x_medium_sq, two_y_medium_sq)
 
             if loops >= 0:
                 for row in range(self.x):
@@ -145,6 +146,17 @@ def main(winstyle=0):
                         if col == 0 or col == 17:
                             self.sq[row][col].changeColor(color_BLACK)
             return done
+
+        def ChColor(self,x,y,color):
+            if x >= 0 and x < 18:
+                self.sq[x][y].changeColor(color)
+        
+        def WhatIsColor(self, x, y):
+            if x >= 18 or y >= 18 or x < 0 or y < 0:
+                a = True
+                return a
+            else:
+                return self.sq[x][y].color
 
         def check_2(self):
             output = False
