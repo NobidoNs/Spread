@@ -4,6 +4,7 @@ import sys
 import math
 import tkinter
 from tkinter import ttk
+import time
 
 
 def main(winstyle=0):
@@ -27,7 +28,7 @@ def main(winstyle=0):
     
 
     class Rect:
-        def __init__(self, color,pos=[10,10]):
+        def __init__(self, color,pos=[margin,margin]):
             self.color=color
             self.x=pos[0]
             self.y=pos[1]
@@ -85,27 +86,41 @@ def main(winstyle=0):
                 return None
             return self.sq[x][y]
 
+        def clear_medium_sq(self, x_medium_sq, y_medium_sq):
+            for y in range(3):
+                for x in range(3):
+                    x1 = (x_medium_sq * 3) + x
+                    y1 = (y_medium_sq * 3) + y
+                    if self.WhatIsColor(x1, y1) == color_RED:
+                        self.ChColor(x1, y1, color_WHITE)
+
+        def onlyColorfull(self, x_medium_sq, y_medium_sq):
+            x_centr = x_medium_sq * 3 + 1
+            y_centr = y_medium_sq * 3 + 1
+            x_on = [1, 0, 2, 1]
+            y_pos = y_centr
+            rec = 0
+            for i in x_on:
+                if self.getSq((x_centr - 1)  + i,(y_pos - 1)).color != color_WHITE:
+                    rec += 1
+                    if rec == 1 or rec == 3:
+                        y_pos += 1
+                    if rec == 4:
+                        return True
+
         def check(self, x_medium_sq, y_medium_sq, medium_sq):
             x_centr = x_medium_sq * 3 + 1
             y_centr = y_medium_sq * 3 + 1
             y_pos = y_centr
             enables = []
             rec  = 0
-            x_on = [1, 0, 2, 1]
             done = False
             part = False
             # print("x_form", x_medium_sq * 3 + 1)
             # print("y_form", y_medium_sq * 3 + 1)
+            if self.onlyColorfull(x_medium_sq, y_medium_sq) == True:
+                done = True
             
-            for i in x_on:
-                if self.getSq((x_centr - 1)  + i,(y_pos - 1)).color != color_WHITE:
-                    rec += 1
-                    if self.getSq((x_centr - 1)  + i,(y_pos - 1)).color != color_RED:
-                        part = True
-                    if rec == 1 or rec == 3:
-                        y_pos += 1
-                    if rec == 4:
-                        done = True
             rec = 0
             y_pos = y_centr
             enables = []
@@ -116,23 +131,16 @@ def main(winstyle=0):
             pos = 0
 
             if done == True:
-                for i in x_on:
-                    if self.sq[(x_centr - 1)  + i][(y_pos - 1)].color != color_WHITE:
-                        self.sq[(x_centr - 1) + i][(y_pos - 1)].changeColor(color_WHITE)
-                        rec += 1
-                        if rec == 1 or rec == 3:
-                            y_pos += 1
+                self.clear_medium_sq(x_medium_sq, y_medium_sq)
+                for i in range(4):
                     loops += 1
                     x1 = x_centr - x_to_activated[loops]
                     y1 = y_centr - y_to_activated[loops]
-                    # print("a",x1, y1)
 
                     two_x_medium_sq = (x1) // 3
                     two_y_medium_sq = (y1) // 3
-
-                    bul = True
                     
-                    if self.WhatIsColor(x1, y1) != bul:
+                    if self.WhatIsColor(x1, y1) != True:
                         if self.WhatIsColor(x1, y1) == color_WHITE:
                             self.ChColor(x1, y1, color_RED)
                         elif self.WhatIsColor(x1, y1) == color_RED:
@@ -180,35 +188,18 @@ def main(winstyle=0):
             one_row = row_row
             one_column = column
             done = False
-            # print("x", x_mouse, "y", y_mouse)
-            x_medium_sq = int((x_mouse) // (125) )
+            print(x_mouse, y_mouse)
+            # x_medium_sq = int((x_mouse) // ((height*3) + ) )
             y_medium_sq = int((y_mouse) // (125) )
+            x_medium_sq = int((x_mouse) // (125) )
             medium_sq = int(x_medium_sq + y_medium_sq*6)
-            # print("x",x_medium_sq)
-            # print("y",y_medium_sq)
-            # print(medium_sq)
             color=self.sq[column][row_row].color
             if color == color_WHITE:
                 self.sq[column][row_row].changeColor(color_RED)
-                # done = self.check(x_medium_sq, y_medium_sq, medium_sq)
                 done = self.check_2()
-                # print("row", row_row, "column", column)
             if done == True:
                 done = self.check(x_medium_sq, y_medium_sq, medium_sq)
-            # if self.sq[row_row][column].color == color_RED and self.sq[row_row + 1][column - 1].color == color_RED and (
-            # self.sq[row_row - 1][column - 1].color == color_RED and self.sq[row_row][column - 2].color == color_RED ):
-            #     print("s1")
 
-
-                    
-            # if self.sq[row][col].z==7 and color==color_RED:
-            #     pass
-            # if self.sq[row][col].z==1 and color==color_RED:
-            #     pass
-            # if self.sq[row][col].z==3 and color==color_RED:
-            #     pass
-            # if self.sq[row][col].z==5 and color==color_RED:
-            #     pass
         def draw(self):
             for i in range(self.x):
                 for j in range(self.y):
