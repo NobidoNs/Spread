@@ -23,6 +23,8 @@ def main(winstyle=0):
     width = 30
     height = 30
     margin = 10
+    indent = 5
+    player = None
     
     
     
@@ -39,7 +41,7 @@ def main(winstyle=0):
         def draw(self):
             #self.x=col*width+(col+1)*margin
             #self.y=row*height+(row+1)*margin
-            pygame.draw.rect(display,self.color,(self.x*(self.width+10)+10,self.y*(self.heght+10)+10,self.width,self.heght))
+            pygame.draw.rect(display,self.color,(self.x*(self.width+margin)+margin,self.y*(self.heght+margin)+margin,self.width,self.heght))
         def changeColor(self,color):
             #self.column = x_mouse // (margin+width)
             #self.row = y_mouse // (margin+height)
@@ -108,7 +110,11 @@ def main(winstyle=0):
                     if rec == 4:
                         return True
 
-        def check(self, x_medium_sq, y_medium_sq, medium_sq):
+        def renderOnce(self):
+            for x in range(10):
+                render()
+
+        def check(self, x_medium_sq, y_medium_sq):
             x_centr = x_medium_sq * 3 + 1
             y_centr = y_medium_sq * 3 + 1
             y_pos = y_centr
@@ -116,8 +122,6 @@ def main(winstyle=0):
             rec  = 0
             done = False
             part = False
-            # print("x_form", x_medium_sq * 3 + 1)
-            # print("y_form", y_medium_sq * 3 + 1)
             if self.onlyColorfull(x_medium_sq, y_medium_sq) == True:
                 done = True
             
@@ -145,6 +149,7 @@ def main(winstyle=0):
                             self.ChColor(x1, y1, color_RED)
                         elif self.WhatIsColor(x1, y1) == color_RED:
                             self.colorJamp(two_x_medium_sq, two_y_medium_sq)
+                self.renderOnce()
 
             if loops >= 0:
                 for row in range(self.x):
@@ -174,7 +179,7 @@ def main(winstyle=0):
                         x_medium_sq = a // 3 
                         y_medium_sq = i // 3 
                         # print(x_medium_sq)
-                        output = self.check(x_medium_sq, y_medium_sq, None)
+                        output = self.check(x_medium_sq, y_medium_sq)
                         if output == True:
                             self.check_2()
                             # print("done")
@@ -182,23 +187,15 @@ def main(winstyle=0):
                         
 
         def click(self,x_mouse,y_mouse):
-            column = (x_mouse-10) // (10+self.width)
-            row_row = (y_mouse-10) // (10+self.heght)
-            rec = 0
-            one_row = row_row
-            one_column = column
-            done = False
-            print(x_mouse, y_mouse)
-            # x_medium_sq = int((x_mouse) // ((height*3) + ) )
-            y_medium_sq = int((y_mouse) // (125) )
-            x_medium_sq = int((x_mouse) // (125) )
-            medium_sq = int(x_medium_sq + y_medium_sq*6)
-            color=self.sq[column][row_row].color
+            column = (x_mouse-margin) // (margin+self.width)
+            row_row = (y_mouse-margin) // (margin+self.heght)
+            y_medium_sq = int((y_mouse) // ((height*3) + (margin*3) + indent))
+            x_medium_sq = int((x_mouse) // ((height*3) + (margin*3) + indent))
+            color=self.WhatIsColor(column, row_row)
             if color == color_WHITE:
                 self.sq[column][row_row].changeColor(color_RED)
-                done = self.check_2()
-            if done == True:
-                done = self.check(x_medium_sq, y_medium_sq, medium_sq)
+                self.check_2()
+            
 
         def draw(self):
             for i in range(self.x):
@@ -209,7 +206,9 @@ def main(winstyle=0):
     color=color_WHITE
     rects=Rects()
 
-    while True:
+
+
+    def render():
         display.fill(color_BLACK)
         x_mouse, y_mouse = pygame.mouse.get_pos()
         for ivent in pygame.event.get():
@@ -237,9 +236,11 @@ def main(winstyle=0):
         pygame.display.update()
 
         clock.tick(20)
+
+    while True:
+        render()
     pygame.time.wait(1000)
     pygame.quit()
-
 # call the "main" function if running this script
 if __name__ == "__main__":
     main()
