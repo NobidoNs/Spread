@@ -54,6 +54,7 @@ def main(winstyle=0):
             self.n=[]
             self.first=True
             self.player = 1
+            self.plColor = color_RED
             self.plColors = [color_RED, color_BLUE]
             self.sq = [[i * j for j in range(self.x)] for i in range(self.y)]
             for row in range(self.x):
@@ -132,51 +133,57 @@ def main(winstyle=0):
             for x in range(10):
                 render()
 
-        def check(self, x_medium_sq, y_medium_sq, plColor):
+        def chPlayer(self, nowPlayer):
+            if nowPlayer == color_BLUE:
+                self.plColor = color_RED
+                return color_RED
+            elif nowPlayer == color_RED:
+                self.plColor = color_BLUE
+            else:
+                return color_GREEN
+
+        def BOOM(self,x_medium_sq, y_medium_sq):
             x_centr = x_medium_sq * 3 + 1
             y_centr = y_medium_sq * 3 + 1
-            y_pos = y_centr
-            enables = []
-            rec  = 0
-            done = False
-            part = False
-            if self.onlyColorfull(x_medium_sq, y_medium_sq) == True:
-                done = True
-            
-            rec = 0
-            y_pos = y_centr
-            enables = []
             x_to_activated = [2, -2, 0, 0]
             y_to_activated = [0, 0, 2, -2]
+            self.clear_medium_sq(x_medium_sq, y_medium_sq)
             loops = -1
-            rec_2 = -1
-            pos = 0
+
+            for i in range(4):
+                loops += 1
+                x1 = x_centr - x_to_activated[loops]
+                y1 = y_centr - y_to_activated[loops]
+
+                two_x_medium_sq = (x1) // 3
+                two_y_medium_sq = (y1) // 3
+                z = self.WhatIsColor(x1, y1)
+                
+                if self.WhatIsColor(x1, y1) != True:
+                    if self.WhatIsColor(x1, y1) == color_WHITE:
+                        self.ChColor(x1, y1, self.plColor)
+                    elif z == self.plColors[0] or z == self.plColors[1]:
+                        self.colorJamp(two_x_medium_sq, two_y_medium_sq, self.plColor)
+            self.renderOnce()
+
+        def contur(self):
+            for row in range(self.x):
+                for col in range(self.y):
+                    if row == 0 or row == 17:
+                        self.sq[row][col].changeColor(color_BLACK)
+                    if col == 0 or col == 17:
+                        self.sq[row][col].changeColor(color_BLACK)
+
+        def check(self, x_medium_sq, y_medium_sq):
+
+            done = False
+
+            if self.onlyColorfull(x_medium_sq, y_medium_sq) == True:
+                done = True
 
             if done == True:
-                self.clear_medium_sq(x_medium_sq, y_medium_sq)
-                for i in range(4):
-                    loops += 1
-                    x1 = x_centr - x_to_activated[loops]
-                    y1 = y_centr - y_to_activated[loops]
-
-                    two_x_medium_sq = (x1) // 3
-                    two_y_medium_sq = (y1) // 3
-                    z = self.WhatIsColor(x1, y1)
-                    
-                    if self.WhatIsColor(x1, y1) != True:
-                        if self.WhatIsColor(x1, y1) == color_WHITE:
-                            self.ChColor(x1, y1, plColor)
-                        elif z == self.plColors[0] or z == self.plColors[1]:
-                            self.colorJamp(two_x_medium_sq, two_y_medium_sq, plColor)
-                self.renderOnce()
-
-            if loops >= 0:
-                for row in range(self.x):
-                    for col in range(self.y):
-                        if row == 0 or row == 17:
-                            self.sq[row][col].changeColor(color_BLACK)
-                        if col == 0 or col == 17:
-                            self.sq[row][col].changeColor(color_BLACK)
+                self.BOOM(x_medium_sq, y_medium_sq)
+                self.contur()
             return done
 
         def ChColor(self,x,y,color):
@@ -190,7 +197,7 @@ def main(winstyle=0):
             else:
                 return self.sq[x][y].color
 
-        def check_2(self, plColor):
+        def check_2(self):
             output = False
             for i in range(18):
                 for a in range(18):
@@ -198,46 +205,36 @@ def main(winstyle=0):
                         x_medium_sq = a // 3 
                         y_medium_sq = i // 3 
                         # print(x_medium_sq)
-                        output = self.check(x_medium_sq, y_medium_sq, plColor)
+                        output = self.check(x_medium_sq, y_medium_sq)
                         if output == True:
-                            self.check_2(plColor)
+                            self.check_2()
                             # print("done")
                             output = False
                         
 
         def click(self,x_mouse,y_mouse):
-            if self.player == 1:
-                plColor = color_RED
-            elif self.player == 2:
-                plColor = color_BLUE
             column = (x_mouse-margin) // (margin+self.width)
             row_row = (y_mouse-margin) // (margin+self.heght)
             y_medium_sq = int((y_mouse) // ((height*3) + (margin*3) + indent))
             x_medium_sq = int((x_mouse) // ((height*3) + (margin*3) + indent))
             [fl, c] = self.haveColor(x_medium_sq, y_medium_sq)
             if fl == True:
-                if c == plColor:
+                if c == self.plColor:
                     color=self.WhatIsColor(column, row_row)
 
                     if color == color_WHITE:
-                        self.sq[column][row_row].changeColor(plColor)
-                        self.check_2(plColor)
+                        self.sq[column][row_row].changeColor(self.plColor)
+                        self.check_2()
 
-                    if self.player == 1:
-                        self.player = 2
-                    elif self.player == 2:
-                        self.player = 1
+                    self.chPlayer(self.plColor)
             else:
                 color=self.WhatIsColor(column, row_row)
 
                 if color == color_WHITE:
-                    self.sq[column][row_row].changeColor(plColor)
-                    self.check_2(plColor)
+                    self.sq[column][row_row].changeColor(self.plColor)
+                    self.check_2()
 
-                if self.player == 1:
-                    self.player = 2
-                elif self.player == 2:
-                    self.player = 1
+                self.chPlayer(self.plColor)
             
 
         def draw(self):
