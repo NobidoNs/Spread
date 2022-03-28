@@ -73,7 +73,17 @@ def main(winstyle=0):
                     if self.sq[row][col].z==8:
                         self.sq[row][col].changeColor(color_BLACK)
         
+        def recoloring(self, x_medium_sq, y_medium_sq):
+            for y in range(3):
+                for x in range(3):
+                    x1 = (x_medium_sq*3) + x
+                    y1 = (y_medium_sq*3) + y
+                    a = self.WhatIsColor(x1, y1)
+                    if a == color_BLUE or a == color_RED:
+                        self.ChColor(x1, y1, self.plColor)
+
         def colorJamp(self, x_medium_sq, y_medium_sq, plColor):
+            self.recoloring(x_medium_sq, y_medium_sq)
             br = False
             for y in range(3):
                 for x in range(3):
@@ -162,6 +172,7 @@ def main(winstyle=0):
                 if self.WhatIsColor(x1, y1) != True:
                     if self.WhatIsColor(x1, y1) == color_WHITE:
                         self.ChColor(x1, y1, self.plColor)
+                        self.recoloring(two_x_medium_sq, two_y_medium_sq)
                     elif z == self.plColors[0] or z == self.plColors[1]:
                         self.colorJamp(two_x_medium_sq, two_y_medium_sq, self.plColor)
             self.renderOnce()
@@ -235,7 +246,26 @@ def main(winstyle=0):
                     self.check_2()
 
                 self.chPlayer(self.plColor)
-            
+            if self.first == False:
+                self.loose()
+            self.first = False
+
+        def loose(self):
+            BLoose = True
+            RLoose = True
+            for y in range(18):
+                for x in range(18):
+                    a = self.WhatIsColor(x, y)
+                    if a == color_BLUE:
+                        BLoose = False
+                    if a == color_RED:
+                        RLoose = False
+            if BLoose == True:
+                print("R WIN")
+                pygame.quit()
+            if RLoose == True:
+                print("B WIN")
+                pygame.quit()
 
         def draw(self):
             for i in range(self.x):
