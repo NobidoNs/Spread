@@ -52,6 +52,8 @@ def main(winstyle=0):
             self.width=30
             self.heght=30
             self.n=[]
+            self.rest = False
+            self.whitePole = True
             self.first=True
             self.player = 1
             self.plColor = color_RED
@@ -228,27 +230,37 @@ def main(winstyle=0):
             row_row = (y_mouse-margin) // (margin+self.heght)
             y_medium_sq = int((y_mouse) // ((height*3) + (margin*3) + indent))
             x_medium_sq = int((x_mouse) // ((height*3) + (margin*3) + indent))
+            color=self.WhatIsColor(column, row_row)
+
+            if color == color_BLACK or color == color_YELLOW or (
+            color == self.plColors[0] or color == self.plColors[1]):
+                return None
             [fl, c] = self.haveColor(x_medium_sq, y_medium_sq)
             if fl == True:
-                if c == self.plColor:
-                    color=self.WhatIsColor(column, row_row)
+                if c != self.plColor:
+                    return None
 
-                    if color == color_WHITE:
-                        self.sq[column][row_row].changeColor(self.plColor)
-                        self.check_2()
+            if color == color_WHITE:
+                self.sq[column][row_row].changeColor(self.plColor)
+                self.check_2()
 
-                    self.chPlayer(self.plColor)
-            else:
-                color=self.WhatIsColor(column, row_row)
-
-                if color == color_WHITE:
-                    self.sq[column][row_row].changeColor(self.plColor)
-                    self.check_2()
-
-                self.chPlayer(self.plColor)
-            if self.first == False:
+            self.whitePole = self.whiteList()
+            if self.whitePole == False:
                 self.loose()
+
+            self.chPlayer(self.plColor)
+
+        def whiteList(self):
+            for y in range(self.y):
+                for x in range(self.x):
+                    a = self.WhatIsColor(x, y)
+                    if (a == self.plColors[0] or a == self.plColors[1]) and self.first == False:
+                        print("b")
+                        return False
+            print("a")
             self.first = False
+            return True
+                    
 
         def loose(self):
             BLoose = True
@@ -262,10 +274,32 @@ def main(winstyle=0):
                         RLoose = False
             if BLoose == True:
                 print("R WIN")
-                pygame.quit()
+                print("Click To Restart")
+                self.rest = True
             if RLoose == True:
                 print("B WIN")
-                pygame.quit()
+                print("Click To Restart")
+                self.rest = True
+            if self.rest == True:
+                self.rest = False
+                otv = self.restartClick()
+                if otv == True:
+                    self.fulRsetart()
+        
+        def fulRsetart(self):
+            for row in range(self.x):
+                for col in range(self.y):
+                    a = self.WhatIsColor(row, col)
+                    if a == self.plColors[0] or a == self.plColors[1]:
+                        self.ChColor(row, col, color_WHITE)
+            self.first = True
+
+        def restartClick(self):
+            while True:
+                for ivent in pygame.event.get():
+                    if ivent.type ==  pygame.MOUSEBUTTONDOWN:
+                        return True
+
 
         def draw(self):
             for i in range(self.x):
